@@ -38,23 +38,23 @@ public class FunctionalTest {
     
     @Test
     public void testRetrieveAggregatedListNoFunctional() {
-        List<Integer> result = new ArrayList<>();
+        Integer result = 0;
         for (NestedList eachOuterList : this.outerList)
             for (Integer eachInnerElement : eachOuterList.getInnerList())
                 if (eachInnerElement % 2 == 0)
-                    result.add(eachInnerElement * eachInnerElement);
+                    result += eachInnerElement * eachInnerElement;
         
-        assertThat(result, contains(4, 16, 36, 64));
+        assertThat(result, equalTo(120));
     }
     
     @Test
     public void testRetrieveAggregatedListFunctional() {
-        List<Integer> result = this.outerList.stream()
+        Integer result = this.outerList.stream()
                 .flatMap(element -> element.getInnerList().stream())
                 .filter(element -> element % 2 == 0)
                 .map(element -> element * element)
-                .collect(Collectors.toList());
-        assertThat(result, contains(4, 16, 36, 64));
+                .reduce(0, Integer::sum);
+        assertThat(result, equalTo(120));
     }
     
     public class NestedList {
